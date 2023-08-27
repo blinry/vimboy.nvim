@@ -39,23 +39,55 @@ function OpenVisualSelection()
     OpenPage(fileToOpen)
 end
 
+function RecursivePages(dir)
+    local results = {}
+    for _, file in ipairs(vim.fn.readdir(dir)) do
+        if not file:match('^%.') then
+            local path = file
+            if vim.fn.isdirectory(path) == 1 then
+                for _, r in ipairs(RecursiveFiles(path)) do
+                    table.insert(results, path .. '/' .. r)
+                end
+            else
+                table.insert(results, path)
+            end
+        end
+    end
+    table.sort(results, function(a,b) return #a<#b end)
+    return results
+end
+
+function FindRootDir(filename)
+    local dir = vim.fn.fnamemodify(filename, ':h')
+    if vim.fn.isdirectory(dir .. '/.git') == 1 then
+        return dir
+    elseif vim.fn.isdirectory(dir .. '/../.git') == 1 then
+        return vim.fn.fnamemodify(dir, ':h')
+    else
+        return dir
+    end
+end
+
 -- Open the page with the given name.
 function OpenPage(name)
     local file_name = vim.api.nvim_buf_get_name(0)
-    local base_dir = file_name:match(".*/")
+    local base_dir = FindRootDir(file_name)
+    Debug(base_dir)
 
     local fileToOpen = name
 
     if vim.fn.filereadable(name) == 0 then
         -- If the file doesn't exist, try to find versions of the file with different casing.
-        for _, file in ipairs(vim.fn.readdir(base_dir)) do
-            if string.lower(name) == string.lower(file) then
+        for _, file in ipairs(RecursivePages(base_dir)) do
+            local tail = vim.fn.fnamemodify(file, ':t')
+            if string.lower(name) == string.lower(tail) then
                 fileToOpen = file
                 break
             end
         end
     end
-    vim.cmd('edit ' .. vim.fn.fnameescape(fileToOpen))
+    local path = vim.fn.fnamemodify(base_dir .. '/' .. fileToOpen, ":.")
+    vim.cmd('edit ' .. vim.fn.fnameescape(path))
 end
 
 vim.keymap.set('n', '<CR>', OpenLinkUnderCursor)
