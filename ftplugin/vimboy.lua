@@ -58,5 +58,9 @@ function OpenPage(name)
     vim.cmd('edit ' .. vim.fn.fnameescape(fileToOpen))
 end
 
+-- Basic keybindings.
 vim.keymap.set('n', '<CR>', OpenLinkUnderCursor)
 vim.keymap.set('v', '<CR>', OpenVisualSelection)
+
+-- When entering a buffer, re-run syntax definitions.
+vim.api.nvim_create_autocmd({'BufEnter', 'BufDelete'}, {command='doautoall syntax'})

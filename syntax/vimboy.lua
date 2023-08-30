@@ -1,11 +1,13 @@
+-- Link the 'vimboyLink' highlight group to the eisting 'Underlined' group.
 vim.api.nvim_set_hl(0, "vimboyLink", {link = "Underlined"})
+
+-- Remove all existing vimboyLink syntax matches.
 vim.cmd('syntax clear vimboyLink')
 
-local file_name = vim.api.nvim_buf_get_name(0)
-local base_dir = file_name:match(".*/")
+-- Find the directory of the current file.
+local base_dir = vim.fn.expand('%:h')
 
-function AddLink(filename)
-    vim.cmd('syntax match vimboyLink /\\c\\V\\<' .. vim.fn.escape(filename, '/\\') .. '/')
+-- Loop through all files in the directory, and add a syntax match for each one.
+for _, file in ipairs(vim.fn.readdir(base_dir)) do
+    vim.cmd('syntax match vimboyLink /\\c\\V\\<' .. vim.fn.escape(file, '/\\') .. '/')
 end
-
-for _, file in ipairs(vim.fn.readdir(base_dir)) do AddLink(file) end
