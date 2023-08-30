@@ -1,0 +1,57 @@
+*vimboy.txt*  A very simple personal wiki plugin                      *vimboy*
+
+With Vimboy, you can create personal, local wikis. In buffers with the
+'filetype' "vimboy", all file names that appear in the buffer link to the
+respective files in the same directory.
+
+The name stems from GNOME's Tomboy, which has similar features.
+
+==============================================================================
+INSTALLATION                                             *vimboy-installation*
+
+Install using your favorite package manager. If you don't have a favorite, I'd
+suggest "paq-nvim": https://github.com/savq/paq-nvim
+
+==============================================================================
+CONFIGURATION                                           *vimboy-configuration*
+
+You can declare your wiki directories in your Neovim configuration, either in
+VimScript: >vim
+
+    au BufRead,BufNewFile ~/path/to/wiki/* set ft=vimboy
+
+Or in Lua: >lua
+
+    vim.api.nvim_create_autocmd({"bufnewfile", "bufread"}, {
+        pattern = os.getenv("HOME") .. "/path/to/wiki/*",
+        callback = function()
+            vim.bo.filetype = "vimboy"
+        end
+    })
+
+Vimboy does not have any other configuration options.
+
+==============================================================================
+USAGE                                                           *vimboy-usage*
+
+To start a wiki, create a new file in your wiki directory, like "Main Page".
+
+To create a new page, visually select one or more words and press <CR>, or
+press <CR> on one word in Normal mode.
+
+To follow a link, put the cursor on it and press <CR> in Normal mode.
+
+To delete a page, use :!rm '%' followed by :bd
+
+==============================================================================
+TIPS                                                             *vimboy-tips*
+
+- Filename completion (|i_CTRL-X_CTRL-F|) is awesome for completing links!
+- Use hard- or softlinks of your OS for page aliases.
+- How you format your text is up to you! Markdown tends to work well.
+- Put your wiki directory under version control to get a history and make it
+  shareable!
+- To use Vimboy on your phone, I'd suggest installing a terminal emulator,
+  like Termux for Android devices and just using Vim and Git directly.
+
+ vim:tw=78:et:ft=help:norl:
